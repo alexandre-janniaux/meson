@@ -816,6 +816,8 @@ class Interpreter(InterpreterBase, HoldableObject):
                 if not a.runnable():
                     self._compiled_exe_error(a)
                 expanded_args.append(a.get_path())
+            elif isinstance(a, ExternalProgram):
+                expanded_args += a.command
             elif isinstance(a, compilers.Compiler):
                 FeatureNew.single_use('Compiler object as a variadic argument to `run_command`', '0.61.0', self.subproject, location=self.current_node)
                 prog = ExternalProgram(a.get_exe(), silent=True)
