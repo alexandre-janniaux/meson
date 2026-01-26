@@ -2024,4 +2024,4 @@ class LinuxlikeTests(BasePlatformTests):
 
     def test_run_command_external_program(self):
         testdir = os.path.join(self.unit_test_dir, '125 command list run_command')
-        self.init(testdir, extra_args=['--native-file=' + testdir + '/nativefile.toml'])
+        self.init(testdir, extra_args=['--native-file=' + testdir + '/nativefile.ini'])
