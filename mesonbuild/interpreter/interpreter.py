@@ -811,8 +811,8 @@ class Interpreter(InterpreterBase, HoldableObject):
             elif isinstance(a, mesonlib.File):
                 expanded_args.append(a.absolute_path(srcdir, builddir))
             elif isinstance(a, ExternalProgram):
-                expanded_args.append(a.command[0])
-                expanded_args.extend(a.command[1:])
+                expanded_args.append(a.get_path())
+                expanded_args.extend(a.get_script_args())
             elif isinstance(a, Program):
                 if not a.found():
                     raise InterpreterException(f'command {cmd.get_name()!r} not found or not executable')

@@ -3379,6 +3379,12 @@ class LocalProgram(programs.Program):
         # Only the backend knows the actual path to the build program.
         raise MesonBugException('Cannot call get_path() on program that is a build target.')
 
+    def get_script_args(self) -> T.List[str]:
+        if isinstance(self.program, programs.ExternalProgram):
+            return self.program.get_script_args()
+        # Build targets don't have script args
+        return []
+
     def description(self) -> str:
         if isinstance(self.program, programs.ExternalProgram):
             return self.program.description()

@@ -51,6 +51,10 @@ class Program(mesonlib.HoldableObject, metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def get_script_args(self) -> T.List[str]:
+        pass
+
+    @abstractmethod
     def runnable(self) -> bool:
         pass
 
@@ -76,6 +80,7 @@ class ExternalProgram(Program):
                  exclude_paths: T.Optional[T.List[str]] = None):
         self.name = name
         self.path: T.Optional[str] = None
+        self.path_idx: T.Optional[int] = None
         self.cached_version: T.Optional[str] = None
         self.version_arg = '--version'
         if command is not None:
@@ -109,13 +114,16 @@ class ExternalProgram(Program):
         if self.found():
             # Set path to be the last item that is actually a file (in order to
             # skip options in something like ['python', '-u', 'file.py']. If we
-            # can't find any components, default to the last component of the path.
-            for arg in reversed(self.command):
+            # can't find any components, default to the first component of the
+            # command (the program itself).
+            for i, arg in enumerate(reversed(self.command)):
                 if arg is not None and os.path.isfile(arg):
                     self.path = arg
+                    self.path_idx = len(self.command) - 1 - i
                     break
             else:
-                self.path = self.command[-1]
+                self.path = self.command[0]
+                self.path_idx = 0
 
         if not silent:
             # ignore the warning because derived classes never call this __init__
@@ -380,6 +388,12 @@ class ExternalProgram(Program):
     def get_path(self) -> T.Optional[str]:
         return self.path
 
+    def get_script_args(self) -> T.List[str]:
+        """Return arguments that follow the script path (excludes interpreter)."""
+        if self.path_idx is not None:
+            return self.command[self.path_idx + 1:]
+        return []
+
     def get_name(self) -> str:
         return self.name
 
@@ -391,6 +405,7 @@ class NonExistingExternalProgram(ExternalProgram):  # lgtm [py/missing-call-to-i
         self.name = name
         self.command = [None]
         self.path = None
+        self.path_idx = None
 
     def __repr__(self) -> str:
         r = '<{} {!r} -> {!r}>'
