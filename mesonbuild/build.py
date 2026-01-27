@@ -3385,6 +3385,12 @@ class LocalProgram(programs.Program):
         # Build targets don't have script args
         return []
 
+    def get_interpreter(self) -> T.List[str]:
+        if isinstance(self.program, programs.ExternalProgram):
+            return self.program.get_interpreter()
+        # Build targets don't have interpreters
+        return []
+
     def description(self) -> str:
         if isinstance(self.program, programs.ExternalProgram):
             return self.program.description()
